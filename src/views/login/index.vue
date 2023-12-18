@@ -68,6 +68,7 @@ export default {
     login() {
       this.$refs.form.validate((isOk) => {
         if (isOk) {
+          this.$store.dispatch('user/login', this.loginForm)
           this.$router.push('/dashboard')
         }
       })
