@@ -7,7 +7,7 @@
     <div class="right-menu">
       <el-dropdown class="avatar-container" trigger="click">
         <div class="avatar-wrapper">
-          <img v-if="!avatar" :src="avatar" class="user-avatar">
+          <img v-if="avatar" :src="avatar" class="user-avatar">
           <span v-else class="username">{{ name?.charAt(0) }}</span>
           <span class="name">{{ name }}</span>
           <i class="el-icon-setting" />
