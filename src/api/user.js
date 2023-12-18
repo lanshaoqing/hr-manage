@@ -14,3 +14,10 @@ export function getUserInfo() {
     method: 'get'
   })
 }
+export function updatePassword(data) {
+  return request({
+    url: '/sys/user/updatePass',
+    method: 'put',
+    data
+  })
+}
