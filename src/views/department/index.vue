@@ -22,7 +22,7 @@
         </template>
       </el-tree>
     </div>
-    <AddDept :show-dialog.sync="showDialog" :current-id="currentId" @updateDepartment="getDepartment" />
+    <AddDept ref="addDept" :show-dialog.sync="showDialog" :current-id="currentId" @updateDepartment="getDepartment" />
   </div>
 </template>
 <script>
@@ -53,10 +53,16 @@ export default {
       const result = await getDepartment()
       this.depts = transListToTreeData(result, 0)
     },
-    operateDept(type, id) {
+    async operateDept(type, id) {
       if (type === 'add') {
         this.showDialog = true
         this.currentId = id
+      } else if (type === 'edit') {
+        this.showDialog = true
+        this.currentId = id
+        this.$nextTick(() => {
+          this.$refs.addDept.getDepartmentDetail()
+        })
       }
     }
   }

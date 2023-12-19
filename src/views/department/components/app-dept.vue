@@ -1,5 +1,5 @@
 <template>
-  <el-dialog title="新增部门" :visible="showDialog" @close="close">
+  <el-dialog :title="showTitle" :visible="showDialog" @close="close">
     <el-form ref="addDept" :model="formData" :rules="rules" label-width="120px">
       <el-form-item prop="name" label="部门名称">
         <el-input v-model="formData.name" placeholder="2-10个字符" style="width: 80%" size="mini" />
@@ -34,7 +34,7 @@
 </template>
 
 <script>
-import { getDepartment, getManagerList, addDepartment } from '@/api/department'
+import { getDepartment, getManagerList, addDepartment, getDepartmentDetail, updateDepartment } from '@/api/department'
 export default {
   props: {
     showDialog: {
@@ -62,7 +62,10 @@ export default {
           }, {
             trigger: 'blur',
             validator: async(rule, value, callback) => {
-              const result = await getDepartment()
+              let result = await getDepartment()
+              if (this.formData.id) {
+                result = result.filter(item => item.id !== this.formData.id)
+              }
               if (result.some(item => item.code === value)) {
                 callback(new Error('部门编码已经存在'))
               } else {
@@ -81,7 +84,10 @@ export default {
           }, {
             trigger: 'blur',
             validator: async(rule, value, callback) => {
-              const result = await getDepartment()
+              let result = await getDepartment()
+              if (this.formData.id) {
+                result = result.filter(item => item.id !== this.formData.id)
+              }
               if (result.some(item => item.name === value)) {
                 callback(new Error('部门名称已经存在'))
               } else {
@@ -94,11 +100,23 @@ export default {
       manageList: []
     }
   },
+  computed: {
+    showTitle() {
+      return this.formData.id ? '编辑部门' : '新增部门'
+    }
+  },
   created() {
     this.getManagerList()
   },
   methods: {
     close() {
+      this.formData = {
+        code: '', // 部门编码
+        introduce: '', // 部门介绍
+        managerId: '', // 部门负责人id
+        name: '', // 部门名称
+        pid: '' // 父级部门的id
+      }
       this.$refs.addDept.resetFields()
       this.$emit('update:showDialog', false)
     },
@@ -106,14 +124,23 @@ export default {
       this.manageList = await getManagerList()
     },
     btnOK() {
-      this.$ref.addDept.validate(async valid => {
+      this.$refs.addDept.validate(async valid => {
         if (valid) {
-          await addDepartment({ ...this.formData, pid: this.currentId })
+          let msg = '新增'
+          if (this.formData.id) {
+            await updateDepartment(this.formData)
+            msg = '编辑'
+          } else {
+            await addDepartment({ ...this.formData, pid: this.currentId })
+          }
           this.$emit('updateDepartment')
-          this.$message.success(`新增部门成功`)
+          this.$message.success(`${msg}部门成功`)
           this.close()
         }
       })
+    },
+    async getDepartmentDetail() {
+      this.formData = await getDepartmentDetail(this.currentId)
     }
   }
 }
