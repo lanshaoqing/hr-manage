@@ -26,7 +26,7 @@
   </div>
 </template>
 <script>
-import { getDepartment } from '@/api/department'
+import { getDepartment, delDepartment } from '@/api/department'
 import { transListToTreeData } from '@/utils'
 import AddDept from './components/app-dept'
 export default {
@@ -62,6 +62,12 @@ export default {
         this.currentId = id
         this.$nextTick(() => {
           this.$refs.addDept.getDepartmentDetail()
+        })
+      } else {
+        this.$confirm('确认删除么').then(async() => {
+          await delDepartment(id)
+          this.$message.success('删除部门成功')
+          this.getDepartment()
         })
       }
     }
