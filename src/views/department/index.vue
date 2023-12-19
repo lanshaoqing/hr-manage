@@ -25,21 +25,26 @@
   </div>
 </template>
 <script>
+import { getDepartment } from '@/api/department'
+import { transListToTreeData } from '@/utils'
 export default {
   name: 'Department',
   data() {
     return {
-      depts: [
-        {
-          name: '1', manageName: '管理员', children: [{
-            name: '2', manageName: '管理员2'
-          }, { name: '3', manageName: '管理员3' }]
-        }
-      ],
+      depts: [],
       defaultProps: {
         label: 'name',
         children: 'children'
       }
+    }
+  },
+  created() {
+    this.getDepartment()
+  },
+  methods: {
+    async getDepartment() {
+      const result = await getDepartment()
+      this.depts = transListToTreeData(result, 0)
     }
   }
 }
