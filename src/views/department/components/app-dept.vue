@@ -8,7 +8,14 @@
         <el-input v-model="formData.code" placeholder="2-10个字符" style="width: 80%" size="mini" />
       </el-form-item>
       <el-form-item prop="managerId" label="部门负责人">
-        <el-select v-model="formData.managerId" placeholder="请选择负责人" style="width: 80%" size="mini" />
+        <el-select v-model="formData.managerId" placeholder="请选择负责人" style="width: 80%" size="mini">
+          <el-option
+            v-for="item in manageList"
+            :key="item.id"
+            :label="item.username"
+            :value="item.id"
+          />
+        </el-select>
       </el-form-item>
       <el-form-item prop="introduce" label="部门介绍">
         <el-input v-model="formData.introduce" placeholder="1-100个字符" type="textarea" size="mini" :rows="4" style="width: 80%" />
@@ -17,8 +24,8 @@
         <!-- 按钮 -->
         <el-row type="flex" justify="center">
           <el-col :span="12">
-            <el-button size="mini" type="primary">确定</el-button>
-            <el-button size="mini">取消</el-button>
+            <el-button size="mini" type="primary" @click="btnOK">确定</el-button>
+            <el-button size="mini" @click="close">取消</el-button>
           </el-col>
         </el-row>
       </el-form-item>
@@ -27,12 +34,16 @@
 </template>
 
 <script>
-import { getDepartment } from '@/api/department'
+import { getDepartment, getManagerList, addDepartment } from '@/api/department'
 export default {
   props: {
     showDialog: {
       type: Boolean,
       default: false
+    },
+    currentId: {
+      type: Number,
+      default: null
     }
   },
   data() {
@@ -79,12 +90,30 @@ export default {
             }
           }] // 部门名称
         // pid: '' // 父级部门的id 不需要做校验
-      }
+      },
+      manageList: []
     }
+  },
+  created() {
+    this.getManagerList()
   },
   methods: {
     close() {
+      this.$refs.addDept.resetFields()
       this.$emit('update:showDialog', false)
+    },
+    async getManagerList() {
+      this.manageList = await getManagerList()
+    },
+    btnOK() {
+      this.$ref.addDept.validate(async valid => {
+        if (valid) {
+          await addDepartment({ ...this.formData, pid: this.currentId })
+          this.$emit('updateDepartment')
+          this.$message.success(`新增部门成功`)
+          this.close()
+        }
+      })
     }
   }
 }
