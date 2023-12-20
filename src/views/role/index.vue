@@ -7,27 +7,27 @@
       <el-table :data="list">
         <el-table-column prop="name" label="角色" align="center" width="200">
           <template v-slot="{row}">
-            <el-input v-if="row.isEdit" />
+            <el-input v-if="row.isEdit" v-model="row.editRow.name" size="mini" />
             <span v-else>{{ row.name }}</span>
           </template>
         </el-table-column>
         <el-table-column prop="state" label="启用" align="center" width="200">
           <template v-slot="{row}">
-            <el-switch v-if="row.isEdit" />
+            <el-switch v-if="row.isEdit" v-model="row.editRow.state" :active-value="1" :inactive-value="0" />
             <span v-else>{{ row.state===1 ? '已启用': row.state===0 ? '未启用':'0' }}</span>
           </template>
         </el-table-column>
         <el-table-column prop="description" label="描述" align="center">
           <template v-slot="{row}">
-            <el-input v-if="row.isEdit" type="textarea" />
+            <el-input v-if="row.isEdit" v-model="row.editRow.description" type="textarea" rows="1" />
             <span v-else>{{ row.description }}</span>
           </template>
         </el-table-column>
         <el-table-column label="操作" align="center">
           <template v-slot="{row}">
             <template v-if="row.isEdit">
-              <el-button size="mini" type="primary">确定</el-button>
-              <el-button size="mini">取消</el-button>
+              <el-button size="mini" type="primary" @click="btnEditOK(row)">确定</el-button>
+              <el-button size="mini" @click="btnEditCancel">取消</el-button>
             </template>
             <template v-else>
               <el-button size="mini" type="text">分配权限</el-button>
@@ -74,7 +74,7 @@
   </div>
 </template>
 <script>
-import { getRoleList, addRole } from '@/api/role'
+import { getRoleList, addRole, updateRole } from '@/api/role'
 export default {
   name: 'Role',
   data() {
@@ -107,6 +107,11 @@ export default {
       this.pageParams.total = total
       this.list.forEach(item => {
         this.$set(item, 'isEdit', false)
+        this.$set(item, 'editRow', {
+          state: item.state,
+          name: item.name,
+          description: item.description
+        })
       })
     },
     pageChange(newpage) {
@@ -129,6 +134,24 @@ export default {
     },
     btnEditRow(row) {
       row.isEdit = true
+      row.editRow.name = row.name
+      row.editRow.state = row.state
+      row.editRow.description = row.description
+    },
+    async btnEditOK(row) {
+      if (row.editRow.name && row.editRow.description) {
+        await updateRole({ ...row.editRow, id: row.id })
+        this.$message.success('更新角色成功')
+        Object.assign(row, {
+          ...row.editRow,
+          isEdit: false
+        })
+      } else {
+        this.$message.warning('角色和描述不能为空')
+      }
+    },
+    btnEditCancel() {
+
     }
   }
 }
