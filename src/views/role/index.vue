@@ -27,7 +27,7 @@
           <template v-slot="{row}">
             <template v-if="row.isEdit">
               <el-button size="mini" type="primary" @click="btnEditOK(row)">确定</el-button>
-              <el-button size="mini" @click="btnEditCancel">取消</el-button>
+              <el-button size="mini" @click="row.isEdit=false">取消</el-button>
             </template>
             <template v-else>
               <el-button size="mini" type="text">分配权限</el-button>
@@ -145,13 +145,10 @@ export default {
         Object.assign(row, {
           ...row.editRow,
           isEdit: false
-        })
+        })// 规避eslint误判
       } else {
         this.$message.warning('角色和描述不能为空')
       }
-    },
-    btnEditCancel() {
-
     }
   }
 }
