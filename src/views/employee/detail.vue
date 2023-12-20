@@ -99,6 +99,7 @@
 
 <script>
 import SelectTree from './components/select-tree'
+import { addEmployee, getEmployeeDetail } from '@/api/employee'
 export default {
   components: {
     SelectTree
@@ -110,7 +111,7 @@ export default {
         mobile: '', // 手机号
         workNumber: '', // 工号
         formOfEmployment: null, // 聘用形式
-        departmentId: 10, // 部门id
+        departmentId: null, // 部门id
         timeOfEntry: '', // 入职时间
         correctionTime: '' // 转正时间
       },
@@ -142,9 +143,23 @@ export default {
 
     }
   },
+  created() {
+    if (this.$route.params.id) {
+      this.getEmployeeDetail()
+    }
+  },
   methods: {
     saveData() {
-      this.$refs.userForm.validate()
+      this.$refs.userForm.validate(async valid => {
+        if (valid) {
+          await addEmployee(this.userInfo)
+          this.$message.success('新增员工成功')
+          this.$router.push('/employee')
+        }
+      })
+    },
+    async getEmployeeDetail() {
+      this.userInfo = await getEmployeeDetail(this.$route.params.id)
     }
   }
 }

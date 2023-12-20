@@ -36,3 +36,17 @@ export function delEmployee(id) {
     url: `/sys/user/${id}`
   })
 }
+
+export function addEmployee(data) {
+  return request({
+    url: '/sys/user',
+    method: 'post',
+    data
+  })
+}
+
+export function getEmployeeDetail(id) {
+  return request({
+    url: `/sys/user/${id}`
+  })
+}
