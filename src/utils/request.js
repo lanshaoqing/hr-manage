@@ -15,6 +15,7 @@ service.interceptors.request.use(config => {
   return Promise.reject(err)
 })
 service.interceptors.response.use(response => {
+  if (response.data instanceof Blob) return response.data
   const { data, message, success } = response.data
   if (success) {
     return data
