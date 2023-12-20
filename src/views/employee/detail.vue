@@ -29,6 +29,7 @@
                   v-model="userInfo.mobile"
                   size="mini"
                   class="inputW"
+                  :disabled="!!this.$route.params.id"
                 />
               </el-form-item>
             </el-col>
@@ -99,7 +100,7 @@
 
 <script>
 import SelectTree from './components/select-tree'
-import { addEmployee, getEmployeeDetail } from '@/api/employee'
+import { addEmployee, getEmployeeDetail, updateEmployee } from '@/api/employee'
 export default {
   components: {
     SelectTree
@@ -152,8 +153,13 @@ export default {
     saveData() {
       this.$refs.userForm.validate(async valid => {
         if (valid) {
-          await addEmployee(this.userInfo)
-          this.$message.success('新增员工成功')
+          if (this.$route.params.id) {
+            await updateEmployee(this.userInfo)
+            this.$message.success('更新员工成功')
+          } else {
+            await addEmployee(this.userInfo)
+            this.$message.success('新增员工成功')
+          }
           this.$router.push('/employee')
         }
       })
@@ -165,13 +171,13 @@ export default {
 }
 </script>
 
-  <style scoped lang="scss">
-      .edit-form {
-        background: #fff;
-        padding: 20px;
-        .inputW {
-          width: 380px
-        }
-      }
+<style scoped lang="scss">
+    .edit-form {
+    background: #fff;
+    padding: 20px;
+    .inputW {
+        width: 380px
+    }
+    }
 
-  </style>
+</style>
