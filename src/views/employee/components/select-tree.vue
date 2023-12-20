@@ -3,6 +3,9 @@
     size="mini"
     :options="treeData"
     :props="props"
+    separator="-"
+    :value="value"
+    @change="changeValue"
   />
 </template>
 
@@ -10,6 +13,12 @@
 import { getDepartment } from '@/api/department'
 import { transListToTreeData } from '@/utils'
 export default {
+  props: {
+    value: {
+      type: Number,
+      default: null
+    }
+  },
   data() {
     return {
       treeData: [],
@@ -26,6 +35,13 @@ export default {
     async getDepartment() {
       const result = await getDepartment()
       this.treeData = transListToTreeData(result, 0)
+    },
+    changeValue(list) {
+      if (list.length > 0) {
+        this.$emit('input', list[list.length - 1])
+      } else {
+        this.$emit('input', null)
+      }
     }
   }
 }

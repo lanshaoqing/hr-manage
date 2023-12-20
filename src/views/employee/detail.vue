@@ -37,7 +37,7 @@
             <el-col :span="12">
               <el-form-item label="部门" prop="departmentId">
                 <!-- 放置及联部门组件 会单独封装-->
-                <SelectTree class="inputW" />
+                <SelectTree v-model="userInfo.departmentId" class="inputW" />
               </el-form-item>
             </el-col>
           </el-row>
@@ -110,7 +110,7 @@ export default {
         mobile: '', // 手机号
         workNumber: '', // 工号
         formOfEmployment: null, // 聘用形式
-        departmentId: null, // 部门id
+        departmentId: 10, // 部门id
         timeOfEntry: '', // 入职时间
         correctionTime: '' // 转正时间
       },
