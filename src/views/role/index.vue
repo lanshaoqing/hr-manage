@@ -30,7 +30,7 @@
               <el-button size="mini" @click="row.isEdit=false">取消</el-button>
             </template>
             <template v-else>
-              <el-button size="mini" type="text">分配权限</el-button>
+              <el-button size="mini" type="text" @click="btnPermission(row.id)">分配权限</el-button>
               <el-button size="mini" type="text" @click="btnEditRow(row)">编辑</el-button>
               <el-popconfirm
                 title="这是一段内容确定删除吗？"
@@ -76,10 +76,31 @@
         </el-form-item>
       </el-form>
     </el-dialog>
+    <!-- 权限弹层 -->
+    <el-dialog :visible.sync="showPermissionDialog" title="分配权限">
+      <el-tree
+        ref="permTree"
+        :data="permissionData"
+        :props="props"
+        show-checkbox
+        default-expand-all
+        :default-checked-keys="permIds"
+        node-key="id"
+        check-strictly
+      />
+      <el-row type="flex" justify="center">
+        <el-col :span="6">
+          <el-button type="primary" size="mini" @click="btnPermissionOK">确定</el-button>
+          <el-button size="mini" @click="showPermissionDialog = false">取消</el-button>
+        </el-col>
+      </el-row>
+    </el-dialog>
   </div>
 </template>
 <script>
-import { getRoleList, addRole, updateRole, delRole } from '@/api/role'
+import { getRoleList, addRole, updateRole, delRole, getRoleDetail, assignPerm } from '@/api/role'
+import { getPermissionList } from '@/api/permission'
+import { transListToTreeData } from '@/utils'
 export default {
   name: 'Role',
   data() {
@@ -99,7 +120,14 @@ export default {
       rules: {
         name: [{ required: true, message: '角色名称不能为空', trigger: 'blur' }],
         description: [{ required: true, message: '角色描述不能为空', trigger: 'blur' }]
-      }
+      },
+      showPermissionDialog: false,
+      permissionData: [],
+      props: {
+        label: 'name'
+      },
+      currentRoleId: null,
+      permIds: []
     }
   },
   created() {
@@ -160,6 +188,22 @@ export default {
       this.$message.success('删除角色成功')
       if (this.list.length === 1) this.pageParams.page--
       this.getRoleList()
+    },
+    async btnPermission(id) {
+      this.currentRoleId = id
+      const { permIds } = await getRoleDetail(id)
+      this.permIds = permIds
+      const result = await getPermissionList()
+      this.permissionData = transListToTreeData(result, 0)
+      this.showPermissionDialog = true
+    },
+    async btnPermissionOK() {
+      await assignPerm({
+        id: this.currentRoleId,
+        permIds: this.$refs.permTree.getCheckedKeys()
+      })
+      this.$message.success('角色分配权限成功')
+      this.showPermissionDialog = false
     }
   }
 }

@@ -36,3 +36,4 @@ export function getPermissionDetail(id) {
     url: `/sys/permission/${id}`
   })
 }
+
