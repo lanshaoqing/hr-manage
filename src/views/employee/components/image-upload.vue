@@ -40,12 +40,12 @@ export default {
     },
     uploadImage(params) {
       const cos = new COS({
-        SecretId: 'AKIDKVTDk5IIZdUTKwQh0Xs0vc7D7nGUXN5b',
-        SecretKey: 'ZvvkNp5A1e3MVSDk5GEtNdhYBaq0ykLl'
+        SecretId: '',
+        SecretKey: ''
       })// cos腾讯云对象初始化
       cos.putObject({
-        Bucket: 'lanshaoqing-1323291221',
-        Region: 'ap-beijing',
+        Bucket: '',
+        Region: '',
         Key: params.file.name,
         StorageClass: 'STANDARD',
         Body: params.file
