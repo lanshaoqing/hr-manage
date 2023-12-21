@@ -52,7 +52,7 @@
           <el-table-column label="操作" width="280px">
             <template v-slot="{row}">
               <el-button size="mini" type="text" @click="$router.push(`/employee/detail/${row.id}`)">查看</el-button>
-              <el-button size="mini" type="text">角色</el-button>
+              <el-button size="mini" type="text" @click="btnRole(row.id)">角色</el-button>
               <el-popconfirm title="确认删除该行数据吗？" @onConfirm="confirmDel(row.id)">
                 <el-button slot="reference" style="margin-left:10px" size="mini" type="text">删除</el-button>
               </el-popconfirm>
@@ -72,6 +72,22 @@
       </div>
     </div>
     <import-excel :show-excel-dialog.sync="showExcelDialog" @uploadSuccess="getEmployeeList" />
+    <el-dialog :visible.sync="showDialog" title="分配角色">
+      <el-checkbox-group v-model="roleIds">
+        <!-- 放置n个的checkbox  要执行checkbox的存储值 item.id-->
+        <el-checkbox
+          v-for="item in roleList"
+          :key="item.id"
+          :label="item.id"
+        >{{ item.name }}</el-checkbox>
+      </el-checkbox-group>
+      <el-row style="margin-top: 40px;" type="flex" justify="center">
+        <el-col :span="6">
+          <el-button size="mini" type="primary" @click="btnRoleOK">确定</el-button>
+          <el-button size="mini" @click="showDialog = false">取消</el-button>
+        </el-col>
+      </el-row>
+    </el-dialog>
   </div>
 </template>
 
@@ -79,7 +95,7 @@
 import ImportExcel from './components/import-excel.vue'
 import FileSaver from 'file-saver'
 import { getDepartment } from '@/api/department'
-import { getEmployeeList, exportEmployee, delEmployee } from '@/api/employee'
+import { getEmployeeList, exportEmployee, delEmployee, getEnableRoleList, getEmployeeDetail, assignRole } from '@/api/employee'
 import { transListToTreeData } from '@/utils'
 export default {
   name: 'Employee',
@@ -101,7 +117,11 @@ export default {
       },
       total: 0,
       list: [],
-      showExcelDialog: false
+      showExcelDialog: false,
+      showDialog: false,
+      roleList: [],
+      roleIds: [],
+      currentUserId: null
     }
   },
   created() {
@@ -149,6 +169,21 @@ export default {
       }
       this.getDepartment()
       this.$message.success('删除员工成功')
+    },
+    async btnRole(id) {
+      this.roleList = await getEnableRoleList()
+      this.currentUserId = id
+      const { roleIds } = await getEmployeeDetail(id)
+      this.roleIds = roleIds
+      this.showDialog = true
+    },
+    async btnRoleOK() {
+      await assignRole({
+        id: this.currentUserId,
+        roleIds: this.roleIds
+      })
+      this.$message.success('分配成功')
+      this.showDialog = false
     }
   }
 

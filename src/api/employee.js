@@ -44,7 +44,6 @@ export function addEmployee(data) {
     data
   })
 }
-
 export function getEmployeeDetail(id) {
   return request({
     url: `/sys/user/${id}`
@@ -54,6 +53,20 @@ export function getEmployeeDetail(id) {
 export function updateEmployee(data) {
   return request({
     url: `/sys/user/${data.id}`,
+    method: 'put',
+    data
+  })
+}
+
+export function getEnableRoleList() {
+  return request({
+    url: '/sys/role/list/enabled'
+  })
+}
+
+export function assignRole(data) {
+  return request({
+    url: '/sys/user/assignRoles',
     method: 'put',
     data
   })
