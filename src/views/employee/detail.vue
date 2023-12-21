@@ -82,6 +82,7 @@
             <el-col :span="12">
               <el-form-item label="员工头像">
                 <!-- 放置上传图片 -->
+                <ImageUpload v-model="userInfo.staffPhoto" />
               </el-form-item>
             </el-col>
           </el-row>
@@ -100,10 +101,12 @@
 
 <script>
 import SelectTree from './components/select-tree'
+import ImageUpload from './components/image-upload'
 import { addEmployee, getEmployeeDetail, updateEmployee } from '@/api/employee'
 export default {
   components: {
-    SelectTree
+    SelectTree,
+    ImageUpload
   },
   data() {
     return {
@@ -114,7 +117,8 @@ export default {
         formOfEmployment: null, // 聘用形式
         departmentId: null, // 部门id
         timeOfEntry: '', // 入职时间
-        correctionTime: '' // 转正时间
+        correctionTime: '', // 转正时间
+        staffPhoto: 'https://img.gmz88.com:4433/uploadimg/image/20190102/15464202855c2c803d245e34.71351857.jpeg'
       },
       rules: {
         username: [{ required: true, message: '请输入姓名', trigger: 'blur' }, {
