@@ -35,6 +35,16 @@ Vue.use(ElementUI)
 
 Vue.config.productionTip = false
 
+// 注册自定义指令
+Vue.directive('permission', {
+  inserted(el, binding) {
+    const points = store.state.user.userInfo?.roles?.points || []
+    if (!points.includes(binding.value)) {
+      el.remove()
+    }
+  }
+})
+
 new Vue({
   el: '#app',
   router,
