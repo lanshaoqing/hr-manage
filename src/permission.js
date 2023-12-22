@@ -2,6 +2,7 @@ import router from '@/router'
 import nprogress from 'nprogress'
 import 'nprogress/nprogress.css'
 import store from '@/store'
+import { asyncRoutes } from '@/router'
 
 const whiteList = ['/login', '/404']
 router.beforeEach(async(to, from, next) => {
@@ -13,9 +14,15 @@ router.beforeEach(async(to, from, next) => {
       nprogress.done()
     } else {
       if (!store.getters.userId) {
-        await store.dispatch('user/getUserInfo')
+        const { roles } = await store.dispatch('user/getUserInfo')
+        const filterRoutes = asyncRoutes.filter(item => {
+          return roles.menus.includes(item.name)
+        })
+        router.addRoutes([...filterRoutes, { path: '*', redirect: '/404', hidden: true }])// 404必须放在所有路由后面
+        next(to.path)// 缺陷
+      } else {
+        next()
       }
-      next()
     }
   } else {
     if (whiteList.indexOf(to.path) > -1) {

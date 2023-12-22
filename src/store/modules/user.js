@@ -25,6 +25,7 @@ const actions = {
   async getUserInfo(context) {
     const result = await getUserInfo()
     context.commit('setUserInfo', result)
+    return result
   },
   logout(context) {
     context.commit('removeToken')
