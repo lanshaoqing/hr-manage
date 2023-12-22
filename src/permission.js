@@ -18,6 +18,7 @@ router.beforeEach(async(to, from, next) => {
         const filterRoutes = asyncRoutes.filter(item => {
           return roles.menus.includes(item.name)
         })
+        store.commit('user/setRoutes', filterRoutes)
         router.addRoutes([...filterRoutes, { path: '*', redirect: '/404', hidden: true }])// 404必须放在所有路由后面
         next(to.path)// 缺陷
       } else {

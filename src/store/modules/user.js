@@ -1,8 +1,10 @@
 import { getToken, setToken, removeToken } from '@/utils/auth'
 import { getUserInfo, login } from '@/api/user'
+import { constantRoutes } from '@/router'
 const state = {
   token: getToken(),
-  userInfo: {}
+  userInfo: {},
+  routes: constantRoutes
 }
 const mutations = {
   setToken(state, value) {
@@ -15,6 +17,9 @@ const mutations = {
   },
   setUserInfo(state, value) {
     state.userInfo = value
+  },
+  setRoutes(state, value) {
+    state.routes = [...constantRoutes, ...value]
   }
 }
 const actions = {
