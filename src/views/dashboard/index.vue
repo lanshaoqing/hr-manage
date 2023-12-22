@@ -147,6 +147,7 @@
             </div>
             <div class="chart">
               <!-- 图表 -->
+              <div ref="social" style="width: 100%; height: 100%;" />
             </div>
           </div>
         </div>
@@ -192,6 +193,7 @@
             </div>
             <div class="chart">
               <!-- 图表 -->
+              <div ref="provident" style="width: 100%; height: 100%;" />
             </div>
           </div>
         </div>
@@ -234,34 +236,13 @@
         <div class="panel">
           <div class="panel-title">通知公告</div>
           <div class="information-list">
-            <div class="information-list-item">
-              <img src="@/assets/common/img.jpeg" alt="">
+            <div v-for="(item,index) in list" :key="index" class="information-list-item">
+              <img :src="item.icon" alt="">
               <div>
                 <p>
-                  <span class="col">朱继柳</span> 发布了
-                  第1期“传智大讲堂”互动讨论获奖名单公布
+                  {{ item.notice }}
                 </p>
-                <p>2018-07-21 15:21:38</p>
-              </div>
-            </div>
-            <div class="information-list-item">
-              <img src="@/assets/common/img.jpeg" alt="">
-              <div>
-                <p>
-                  <span class="col">朱继柳</span> 发布了
-                  第1期“传智大讲堂”互动讨论获奖名单公布
-                </p>
-                <p>2018-07-21 15:21:38</p>
-              </div>
-            </div>
-            <div class="information-list-item">
-              <img src="@/assets/common/img.jpeg" alt="">
-              <div>
-                <p>
-                  <span class="col">朱继柳</span> 发布了
-                  第1期“传智大讲堂”互动讨论获奖名单公布
-                </p>
-                <p>2018-07-21 15:21:38</p>
+                <p>{{ item.createTime }}</p>
               </div>
             </div>
           </div>
@@ -274,25 +255,89 @@
 <script>
 import CountTo from 'vue-count-to'
 import { mapGetters } from 'vuex'
-import { getHomeData } from '@/api/home'
+import { getHomeData, getMessageList } from '@/api/home'
+import * as echarts from 'echarts/core'
+// 引入柱状图图表，图表后缀都为 Chart
+import { LineChart } from 'echarts/charts'
+import { GridComponent } from 'echarts/components'
+import { CanvasRenderer } from 'echarts/renderers'
+echarts.use([LineChart, GridComponent, CanvasRenderer])
 export default {
   components: {
     CountTo
   },
   data() {
     return {
-      homeData: {}
+      homeData: {}, // 存放首页数据的对象
+      list: []
     }
   },
+  // 计算属性
   computed: {
-    ...mapGetters(['name', 'avatar', 'company', 'departmentName'])
+    ...mapGetters(['name', 'avatar', 'company', 'departmentName']) // 映射给了计算属性
+  },
+  watch: {
+    homeData() {
+      this.social.setOption({
+        xAxis: {
+          type: 'category',
+          boundaryGap: false,
+          data: this.homeData.socialInsurance?.xAxis
+        },
+        yAxis: {
+          type: 'value'
+        },
+        series: [
+          {
+            data: this.homeData.socialInsurance?.yAxis,
+            type: 'line',
+            areaStyle: {
+              color: '#04c9be'
+            },
+            lineStyle: {
+              color: '#04c9be'
+            }
+          }
+        ]
+      })
+      this.provident.setOption({
+        xAxis: {
+          type: 'category',
+          boundaryGap: false,
+          data: this.homeData.providentFund?.xAxis
+        },
+        yAxis: {
+          type: 'value'
+        },
+        series: [
+          {
+            data: this.homeData.providentFund?.yAxis,
+            type: 'line',
+            areaStyle: {
+              color: '#04c9be'
+            },
+            lineStyle: {
+              color: '#04c9be'
+            }
+          }
+        ]
+      })
+    }
   },
   created() {
     this.getHomeData()
+    this.getMessageList()
+  },
+  mounted() {
+    this.social = echarts.init(this.$refs.social)
+    this.provident = echarts.init(this.$refs.provident)
   },
   methods: {
     async getHomeData() {
       this.homeData = await getHomeData()
+    },
+    async getMessageList() {
+      this.list = await getMessageList()
     }
   }
 }
@@ -310,6 +355,7 @@ export default {
  ::v-deep .el-calendar-table__row td,::v-deep .el-calendar-table tr td:first-child, ::v-deep .el-calendar-table__row td.prev{
   border:none;
  }
+
 .date-content {
   height: 40px;
   text-align: center;
